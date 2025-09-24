@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from app.schemas.user import Token, TokenData, UserCreate, UserLogin, UserResponse, UserUpdate
 from app.models.user import User as UserModel
 from app.database import get_db
-from app.deps import get_current_user
+from app.deps import get_current_admin, get_current_user
 from app.crud.user import UserCrud
-from app.auth import create_access_token, create_refresh_token
+from app.auth import authenticate_user, create_access_token, create_refresh_token
 from app.deps import security
 from jose import JWTError, jwt
 from datetime import timedelta
@@ -32,18 +32,45 @@ def register_user(user_data: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail=str(e))
     return UserResponse.model_validate(new_user)
 
+@router.post("/create-admin", response_model=UserResponse, status_code=201)
+def register_admin(user_data: UserCreate, db: Session = Depends(get_db)):
+    try:
+        logger.info(f"Registering admin: {user_data.email}")
+        new_admin = UserCrud.create_admin(db, user_data)
+        if not new_admin:
+            raise HTTPException(status_code=400, detail="User already exists")
+        db.commit()
+        logger.info(f"Admin registered: {new_admin.email}")
+    except Exception as e:
+        db.rollback()
+        logger.error((f"Error registering admin: {e}"))  
+        raise HTTPException(status_code=400, detail=str(e))
+    return UserResponse.model_validate(new_admin)
 
+
+# @router.post("/login", response_model=Token)
+# def login_user(user_data: UserLogin, db: Session = Depends(get_db)):
+#     logger.info(f"User login attempt: {user_data.email}")
+#     access_token = UserCrud.login_user(db, user_data)
+#     if not access_token:
+#         raise HTTPException(status_code=401, detail="Invalid credentials")
+#     logger.info(f"User logged in: {user_data.email}")
+#     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/login", response_model=Token)
 def login_user(user_data: UserLogin, db: Session = Depends(get_db)):
     logger.info(f"User login attempt: {user_data.email}")
-    access_token = UserCrud.login_user(db, user_data)
-    if not access_token:
+    db_user = authenticate_user(db, user_data.email, user_data.password)
+    if not db_user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": db_user.email, "role": db_user.role},  
+        expires_delta=access_token_expires
+    )
     logger.info(f"User logged in: {user_data.email}")
     return {"access_token": access_token, "token_type": "bearer"}
-
-
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: UserModel=Depends(get_current_user)):

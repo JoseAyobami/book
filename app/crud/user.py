@@ -24,10 +24,28 @@ class UserCrud:
             role=UserRole.user.value
         )
         db.add(new_user)
-        db.flush()
+        db.commit()
         db.refresh(new_user)
         return new_user
     
+    @staticmethod
+    def create_admin(db: Session, user_data: UserCreate):
+        existing_email = db.query(UserModel).filter(UserModel.email == user_data.email).first()
+        if existing_email:
+            logger.warning(f"Attempt to register with existing email: {user_data.email}")
+            return None        
+
+        hashed_password = hash_password(user_data.password)
+        new_admin = UserModel(
+            name=user_data.name,
+            email=user_data.email,
+            password_hash=hashed_password,
+            role=UserRole.admin.value  
+        )
+        db.add(new_admin)
+        db.commit()
+        db.refresh(new_admin)
+        return new_admin
     
     @staticmethod
     def login_user(db: Session, user: UserLogin):
@@ -37,9 +55,10 @@ class UserCrud:
             return None
         access_token_expires = timedelta(minutes=30)
         access_token = create_access_token(
-            data={"sub": db_user.email}, expires_delta=access_token_expires
+            data={"sub": db_user.email, "role": db_user.role}, expires_delta=access_token_expires
         )
         return access_token
+
     
 
     @staticmethod
@@ -69,11 +88,6 @@ class UserCrud:
         db.delete(user)
         db.flush()
         return {"detail": "User deleted"}
-    
-    
-    
-   
-    
 
 
 user_crud = UserCrud()    

@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from app.models.base import generate_ulid
 from app.models.booking import BookingStatus
 from datetime import datetime
@@ -14,7 +14,6 @@ from app.models.booking import BookingStatus
 
 
 class BookingBase(BaseModel):
-    user_id: str
     service_id: str
     start_time: datetime
     end_time: datetime
@@ -22,13 +21,22 @@ class BookingBase(BaseModel):
 class BookingCreate(BookingBase):
     pass
 
-class BookingRecord(BookingBase):
+class BookingUpdate(BaseModel):
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    status: BookingStatus | None = None # Admin only
+
+    model_config = ConfigDict(from_attributes=True)
+
+class BookingResponse(BookingBase):
     id: str = Field(default_factory=generate_ulid)
+    user_id: str
     status: BookingStatus
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
+    
 
 
 

@@ -22,6 +22,7 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
     try:
         payload = jwt.decode(token.credentials, settings.secret_key, algorithms=[settings.algorithm])
         email: str = payload.get("sub")
+        role: str = payload.get("role")
         if email is None:
             raise credentials_exception
     except InvalidTokenError:
@@ -32,13 +33,15 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
     return user
 
 
+def get_current_admin(current_user: UserModel = Depends(get_current_user), token: str = Depends(security)):
+    payload = jwt.decode(token.credentials, settings.secret_key, algorithms=[settings.algorithm])
+    role: str = payload.get("role")
 
-def get_current_admin(current_user: UserModel = Depends(get_current_user)):
-    if current_user.role != UserRole.admin.value:  
+    if role != UserRole.admin.value:
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
-# def get_current_admin(user: UserModel = Depends(get_current_user)):
-#     if user.role != UserRole.admin:
+# def get_current_admin(current_user: UserModel = Depends(get_current_user)):
+#     if current_user.role != UserRole.admin.value:  
 #         raise HTTPException(status_code=403, detail="Admin access required")
-#     return user
+#     return current_user

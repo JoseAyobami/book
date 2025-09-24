@@ -1,6 +1,6 @@
 from decimal import Decimal
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from pydantic import BaseModel, Field, ConfigDict
 from app.models.base import generate_ulid
 
@@ -13,7 +13,7 @@ class ServiceBase(BaseModel):
     title: str
     description: str
     price: Decimal = Field(..., gt=0)
-    duration_minutes: int = Field(..., gt=0)
+    duration_minutes: timedelta
 
 class ServiceCreate(ServiceBase):
     pass
@@ -22,15 +22,16 @@ class ServiceUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     price: Optional[Decimal] = None
-    duration_minutes: Optional[int] = None
+    duration_minutes: Optional[timedelta] = None
     is_active: Optional[bool] = None
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    model_config = ConfigDict(from_attributes=True)
 
 class ServiceResponse(ServiceBase):
     id: str = Field(default_factory=generate_ulid)
     is_active: bool
     created_at: datetime
+
 
     model_config = ConfigDict(from_attributes=True)
 

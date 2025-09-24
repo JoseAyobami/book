@@ -21,10 +21,7 @@ class Booking(Base):
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     status = Column(Enum(BookingStatus), default=BookingStatus.pending, nullable=False)
-    created_at = Column(
-        DateTime(timezone=True), nullable=False,
-        default=lambda: datetime.now(timezone.utc)
-    )
+    created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
 
 
     user = relationship("User", back_populates="bookings")

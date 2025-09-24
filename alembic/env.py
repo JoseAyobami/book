@@ -4,10 +4,8 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-
 import os
 from dotenv import load_dotenv
-
 load_dotenv()
 
 config = context.config
@@ -31,12 +29,13 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from app.models import user, booking, service, review  # Import all models to ensure they are registered
-from app.database import Base  # Import the Base where models are defined
+from app.database import Base
+from app.models.user import User
+from app.models.booking import Booking      
+from app.models.service import Service
+from app.models.review import Review
 
-
-target_metadata = Base.metadata
-
+target_metadata = Base.metadata  
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

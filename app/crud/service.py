@@ -1,6 +1,7 @@
 from datetime import timedelta
 from sqlalchemy.orm import Session
 from app.logger import get_logger
+from app.models.base import UserRole
 from app.schemas.service import ServiceCreate, ServiceUpdate
 from app.models.service import Service as ServiceModel
 
@@ -15,11 +16,12 @@ class ServiceCrud:
             title=service_data.title,
             description=service_data.description,
             price=service_data.price,
-            duration_minutes=timedelta(minutes=service_data.duration_minutes),
+            duration_minutes=service_data.duration_minutes,
+            role = UserRole.admin.value,
             is_active=True
         )
         db.add(new_service)
-        db.flush()
+        db.commit()
         db.refresh(new_service)
         return new_service
     
@@ -64,37 +66,4 @@ class ServiceCrud:
 
 service_crud = ServiceCrud()
 
-    # @staticmethod
-    # def get_service(db: Session, service_id: str):
-    #     return db.query(ServiceModel).filter(ServiceModel.id == service_id).first()
-
-    # @staticmethod
-    # def list_services(db: Session, skip: int = 0, limit: int = 10):
-    #     return db.query(ServiceModel).offset(skip).limit(limit).all()
-
-    # @staticmethod
-    # def update_service(db: Session, service_id: str, update_data: ServiceUpdate):
-    #     service = db.query(ServiceModel).filter(ServiceModel.id == service_id).first()
-    #     if not service:
-    #         return None
-
-    #     # Update fields if provided
-    #     if update_data.title is not None:
-    #         service.title = update_data.title
-    #     if update_data.description is not None:
-    #         service.description = update_data.description
-    #     if update_data.price is not None:
-    #         service.price = update_data.price
-    #     if update_data.duration_minutes is not None:
-    #         service.duration_minutes = update_data.duration_minutes
-    #     if update_data.is_active is not None:
-    #         service.is_active = update_data.is_active
-
-    #     db.commit()
-    #     db.refresh(service)
-    #     return service
-
-    # @staticmethod
-    # def delete_service(db: Session, service: ServiceModel):
-    #     db.delete(service)
-    #     db.commit()
+    
