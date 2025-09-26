@@ -12,13 +12,18 @@ class Review(Base):
 
     id = Column(String(26), primary_key=True, default=generate_ulid)
     booking_id =Column (String, ForeignKey("booking.id"), nullable=False, unique=True)
-    user_id = Column(String(26), ForeignKey("booking.user_id"), nullable=False)
-    service_id = Column(String(26), ForeignKey("booking.service_id"), nullable=False)
+    user_id = Column(String(26), ForeignKey("user.id"), nullable=False)
+    service_id = Column(String(26), ForeignKey("service.id"), nullable=False)
     rating = Column(Integer, nullable=False)
     comment=  Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc))
 
+
     booking = relationship("Booking", back_populates="review")
+    user = relationship("User", back_populates="reviews")
+    service = relationship("Service", back_populates="reviews")
+    
+
 
         
 

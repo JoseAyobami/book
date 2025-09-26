@@ -26,7 +26,7 @@ class Booking(Base):
 
     user = relationship("User", back_populates="bookings")
     service = relationship("Service", back_populates="bookings")
-    review = relationship("Review", back_populates="booking", uselist=False)
+    review = relationship("Review", back_populates="booking", uselist=False, foreign_keys="Review.booking_id")
 
     
     

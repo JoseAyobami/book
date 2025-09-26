@@ -1,7 +1,7 @@
 from time import timezone
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import date, datetime
 from app.models.base import BookingStatus
 from app.schemas.booking import BookingCreate, BookingUpdate, BookingResponse
 from app.crud.booking import BookingCrud
@@ -25,8 +25,8 @@ def create_booking(
 @router.get("/", response_model=list[BookingResponse])
 def list_bookings(
     status: str = None,
-    from_dt: datetime = None,
-    to_dt: datetime = None,
+    from_dt: date = None,
+    to_dt: date = None,
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(get_current_user)
 ):

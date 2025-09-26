@@ -22,7 +22,9 @@ class Service(Base):
     role = Column(Enum(UserRole), default=UserRole.admin, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False,default=lambda: datetime.now(timezone.utc))
 
-    bookings = relationship("Booking", back_populates="service")
+
+    bookings = relationship("Booking", back_populates="service", cascade="all, delete-orphan")
+    reviews = relationship("Review", back_populates="service", cascade="all, delete-orphan")
 
 
 

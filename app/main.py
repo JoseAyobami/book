@@ -5,6 +5,8 @@ from .database import engine, Base
 from app import models
 from app.models import user, booking, service, review
 from app.routes.services import router as services_route
+from app.routes.booking import router as booking_route
+from app.routes.review import router as review_route
 
 app = FastAPI(
     title="BookIt API",
@@ -24,11 +26,10 @@ app.add_middleware(
 )
 
 
-
-
-
 app.include_router(login_route)
 app.include_router(services_route)
+app.include_router(booking_route)
+app.include_router(review_route)
 
 
 @app.get("/")

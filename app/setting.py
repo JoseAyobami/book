@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
 
 class Settings(BaseSettings):
     # Database
@@ -10,9 +9,12 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
     refresh_token_expire_days: int
-    admin_name: str
-    admin_email: str
-    admin_password: str
+    postgres_user: str
+    postgres_password: str
+    postgres_db: str
+    # admin_name: str
+    # admin_email: str
+    # admin_password: str
 
     # App
     app_name: str = "BookIt API"
@@ -21,9 +23,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 settings = Settings()
 
-# import os
-# print(os.environ.get("refresh_token_expire_days"))
-# print(os.environ.get("refresh_acess_token"))  # Should be None or removed

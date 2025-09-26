@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
 from sqlalchemy import and_
 from datetime import datetime
 from app.models.booking import Booking as BookingModel, BookingStatus
@@ -18,7 +19,7 @@ class BookingCrud:
             )
         ).first()
         if conflict:
-            return None  # Could raise HTTPException
+            return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Booking time conflicts with an existing booking.")
 
         new_booking = BookingModel(
             user_id=user_id,
