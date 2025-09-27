@@ -6,7 +6,8 @@ A production-ready REST API for a simple bookings platform called BookIt.
 
 For this project, I chose **PostgreSQL** as the database. The relational nature of the data (Users, Services, Bookings, Reviews) makes a relational database a good fit. PostgreSQL's features like data integrity, robust data types, and concurrency support are well-suited for a transactional platform like this.
 
-The application is built with **FastAPI**, a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python type hints.
+The application is built with **FastAPI**, a modern, fast (high-performance) web framework for building APIs.
+
 
 **Alembic** is used for database migrations, allowing for version control of the database schema.
 
