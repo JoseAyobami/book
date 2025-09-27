@@ -2,14 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.database import get_db
-from app.deps import get_current_user, get_current_admin
+from app.deps import get_current_admin
 from app.schemas.service import ServiceCreate, ServiceUpdate, ServiceResponse
 from app.crud.service import ServiceCrud
+from app.logger import get_logger
 
 router = APIRouter(prefix="/service", tags=["Service"])
 
+logger = get_logger(__name__)
 
-# --- Public endpoint ---
+
 @router.get("/", response_model=list[ServiceResponse])
 def get_services(
     q: Optional[str] = Query(None),
@@ -30,7 +32,7 @@ def get_service(service_id: str, db: Session = Depends(get_db)):
     return service
 
 
-# --- Admin endpoints ---
+
 @router.post("/", response_model=ServiceResponse)
 def create_service(service_data: ServiceCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     return ServiceCrud.create_service(db, service_data)

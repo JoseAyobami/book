@@ -1,17 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.models.review import Review as ReviewModel
 from app.schemas.review import ReviewCreate, ReviewUpdate, ReviewResponse
 from app.crud.review import ReviewCrud
-from app.deps import get_db, get_current_user, get_current_admin
+from app.models.user import User as UserModel
+from app.deps import get_db, get_current_user
+from app.logger import get_logger
+
+logger = get_logger(__name__) 
 
 router = APIRouter(prefix="/reviews", tags=["Reviews"])
 
 @router.post("", response_model=ReviewResponse)
-def create_review(
+def create_review( 
     review_data: ReviewCreate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserModel=Depends(get_current_user)
 ):
     review = ReviewCrud.create_review(db, current_user.id, review_data)
     if not review:
@@ -27,7 +31,7 @@ def update_review(
     review_id: str,
     review_data: ReviewUpdate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserModel=Depends(get_current_user)
 ):
     review = ReviewCrud.update_review(db, review_id, review_data)
     if not review or review.user_id != current_user.id:
@@ -38,15 +42,15 @@ def update_review(
 def delete_review(
     review_id: str,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: UserModel=Depends(get_current_user)
 ):
     review = db.query(ReviewModel).filter(ReviewModel.id == review_id).first()
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
-    if review.user_id != current_user.id:
-        # Only admin can delete others
-        current_admin = get_current_admin()
-        if not current_admin:
-            raise HTTPException(status_code=403, detail="Not authorized")
-    ReviewCrud.delete_review(db, review_id)
+    if review.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    db.delete(review)
+    db.commit()
     return {"detail": "Review deleted"}
+
+        

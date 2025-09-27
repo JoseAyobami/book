@@ -1,5 +1,4 @@
 from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
 import jwt
@@ -8,7 +7,7 @@ from app.models.user import User as UserModel
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
 
 
 def hash_password(password: str):

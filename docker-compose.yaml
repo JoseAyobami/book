@@ -1,21 +1,19 @@
-version: "3.8"
-
 services:
   api_db:
     image: postgres:17
+    container_name: api_db
     restart: always
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    container_name: api_db  
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
-
+    
   api:
     build:
       context: .
-      dockerfile: app/Dockerfile
+      dockerfile: Dockerfile
     container_name: api
     ports:
       - "8000:8000"
@@ -24,4 +22,8 @@ services:
     env_file: .env
     depends_on:
       - api_db
+
+volumes:
+  postgres_data:
+
 

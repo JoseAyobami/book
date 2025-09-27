@@ -1,9 +1,14 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from sqlalchemy import and_
-from datetime import datetime
+from datetime import datetime, timezone
+from app.logger import get_logger
+from app.models.base import UserRole
 from app.models.booking import Booking as BookingModel, BookingStatus
 from app.schemas.booking import BookingCreate, BookingUpdate
+from app.models.user import User as UserModel
+
+logger = get_logger(__name__)
 
 class BookingCrud:
 
@@ -62,12 +67,12 @@ class BookingCrud:
         db.commit()
         db.refresh(booking)
         return booking
-
+    
     @staticmethod
     def delete_booking(db: Session, booking: BookingModel):
         db.delete(booking)
         db.commit()
-        return True
-    
+
+        
 
 booking_crud = BookingCrud()    

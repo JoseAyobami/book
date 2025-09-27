@@ -19,7 +19,7 @@ class UserCreate(BaseModel):
 
 class UserLogin(BaseModel):
     email: str
-    password: str    
+    password: str = Field(..., min_length=8)   
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None

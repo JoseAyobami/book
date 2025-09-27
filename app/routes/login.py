@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.schemas.user import Token, TokenData, UserCreate, UserLogin, UserResponse, UserUpdate
+from app.schemas.user import Token, TokenData, UserCreate, UserResponse, UserUpdate
 from app.models.user import User as UserModel
 from app.database import get_db
-from app.deps import get_current_admin, get_current_user
+from fastapi.security import OAuth2PasswordRequestForm
+from app.deps import  get_current_user
 from app.crud.user import UserCrud
-from app.auth import authenticate_user, create_access_token, create_refresh_token
+from app.auth import create_access_token, create_refresh_token
 from app.deps import security
 from jose import JWTError, jwt
 from datetime import timedelta
@@ -13,7 +14,7 @@ from app.setting import settings
 from app.logger import get_logger
 
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(prefix="/users", tags=["User"])
 
 logger = get_logger(__name__)
 
@@ -48,40 +49,25 @@ def register_admin(user_data: UserCreate, db: Session = Depends(get_db)):
     return UserResponse.model_validate(new_admin)
 
 
-# @router.post("/login", response_model=Token)
-# def login_user(user_data: UserLogin, db: Session = Depends(get_db)):
-#     logger.info(f"User login attempt: {user_data.email}")
-#     access_token = UserCrud.login_user(db, user_data)
-#     if not access_token:
-#         raise HTTPException(status_code=401, detail="Invalid credentials")
-#     logger.info(f"User logged in: {user_data.email}")
-#     return {"access_token": access_token, "token_type": "bearer"}
-
 @router.post("/login", response_model=Token)
-def login_user(user_data: UserLogin, db: Session = Depends(get_db)):
-    logger.info(f"User login attempt: {user_data.email}")
-    db_user = authenticate_user(db, user_data.email, user_data.password)
-    if not db_user:
+def login_user(user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    logger.info(f"User login attempt: {user_data.username}")
+    access_token = UserCrud.login_user(db, user_data.username, user_data.password)
+    if not access_token:
+        logger.warning(f"Invalid login credentials for user: {user_data.username}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    access_token_expires = timedelta(minutes=30)
-    access_token = create_access_token(
-        data={"sub": db_user.email, "role": db_user.role},  
-        expires_delta=access_token_expires
-    )
-    logger.info(f"User logged in: {user_data.email}")
+    
+    logger.info(f"User logged in successfully: {user_data.username}")
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: UserModel=Depends(get_current_user)):
-    """
-    Returns the current logged-in user profile.
-    """
     logger.info(f"Fetching profile for user: {current_user.email}")
     return current_user
 
 @router.put("/me", response_model=UserResponse)
-def update_me(user_id: str, update_data: UserUpdate, db: Session = Depends(get_db),current_user: UserModel = Depends(get_current_user)
+def update_user(update_data: UserUpdate, db: Session = Depends(get_db),current_user: UserModel = Depends(get_current_user)
 ):
     try:
         logger.info(f"Updating profile for user: {current_user.email}")
@@ -151,9 +137,6 @@ def refresh_access_token(
 
 @router.post("/logout")
 def logout(current_user: UserModel=Depends(get_current_user)):
-    """
-    JWT logout (client should discard the token).
-    """
     logger.info(f"User logged out: {current_user.email}")
     return {"msg": f"User {current_user.email} logged out successfully."}
 

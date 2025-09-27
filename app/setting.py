@@ -12,9 +12,7 @@ class Settings(BaseSettings):
     postgres_user: str
     postgres_password: str
     postgres_db: str
-    # admin_name: str
-    # admin_email: str
-    # admin_password: str
+    
 
     # App
     app_name: str = "BookIt API"

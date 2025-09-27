@@ -1,8 +1,11 @@
 from sqlalchemy.orm import Session
 from app.models.review import Review as ReviewModel
 from app.schemas.review import ReviewCreate, ReviewUpdate
+from app.logger import get_logger
 from app.models.booking import Booking as BookingModel, BookingStatus
 from datetime import datetime, timezone
+
+logger = get_logger(__name__)
 
 class ReviewCrud:
 
@@ -71,25 +74,3 @@ class ReviewCrud:
 
 review_crud = ReviewCrud()
 
-# @staticmethod
-#     def create_review(db: Session, user_id: str, review_data: ReviewCreate):
-#         # Ensure one review per booking
-#         existing = db.query(ReviewModel).filter(
-#             ReviewModel.booking_id == review_data.booking_id,
-#             ReviewModel.user_id == user_id
-#         ).first()
-#         if existing:
-#             return None
-
-#         review = ReviewModel(
-#             user_id=user_id,
-#             booking_id=review_data.booking_id,
-#             service_id=review_data.service_id,
-#             rating=review_data.rating,
-#             comment=review_data.comment,
-#             created_at=datetime.now(timezone.utc)
-#         )
-#         db.add(review)
-#         db.commit()
-#         db.refresh(review)
-#         return review

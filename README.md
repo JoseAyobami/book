@@ -4,18 +4,33 @@ A production-ready REST API for a simple bookings platform called BookIt.
 
 ## Architectural Decisions
 
-### Database: PostgreSQL
+For this project, I chose **PostgreSQL** as the database. The relational nature of the data (Users, Services, Bookings, Reviews) makes a relational database a good fit. PostgreSQL's features like data integrity, robust data types, and concurrency support are well-suited for a transactional platform like this.
 
-I have chosen **PostgreSQL** for this project. Here's why:
+The application is built with **FastAPI**, a modern, fast (high-performance) web framework for building APIs with Python 3.7+ based on standard Python type hints.
 
-*   **Relational Integrity:** The data model (Users, Services, Bookings, Reviews) is highly relational. A booking connects a user and a service, and a review is tied to a booking. PostgreSQL's enforcement of foreign key constraints and ACID compliance ensures data integrity at the database level, which is critical for a transactional system like this.
-*   **Data Types and Constraints:** PostgreSQL offers a rich set of data types (like `TIMESTAMP WITH TIME ZONE`) and powerful constraint capabilities. This allows for robust data validation directly within the database, complementing the application-level validation done by Pydantic.
-*   **Scalability and Concurrency:** PostgreSQL has excellent support for concurrent transactions, which is essential for a bookings platform where multiple users might try to book overlapping time slots. Its performance under load is well-established.
-*   **Maturity and Tooling:** As a mature and widely-used database, PostgreSQL has a vast ecosystem of tools for administration, migration (like Alembic, which is a requirement), and performance analysis.
-
-While MongoDB could work, its document-based nature is less ideal for this tightly-coupled, relational data, and would require implementing more data integrity logic at the application level.
+**Alembic** is used for database migrations, allowing for version control of the database schema.
 
 ## How to Run Locally
+
+### Using Docker
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <your-repo-url>
+    cd bookit
+    ```
+
+2.  **Create a `.env` file:**
+    Copy the `.env.example` to a new `.env` file and fill in the required values.
+
+3.  **Build and run the containers:**
+    ```bash
+    docker-compose up --build
+    ```
+
+The API will be available at `http://localhost:8000`.
+
+### Without Docker
 
 1.  **Clone the repository:**
     ```bash
@@ -35,10 +50,10 @@ While MongoDB could work, its document-based nature is less ideal for this tight
     ```
 
 4.  **Set up environment variables:**
-    *   Copy the `.env.example` to a new `.env` file.
-    *   Fill in the required values in the `.env` file (database URL, JWT secret, etc.).
+    *   Create a `.env` file.
+    *   Fill in the required values in the `.env` file (see Environment Variables section).
 
-5.  **Run database migrations (if using Alembic):**
+5.  **Run database migrations:**
     ```bash
     alembic upgrade head
     ```
@@ -50,14 +65,35 @@ While MongoDB could work, its document-based nature is less ideal for this tight
 
 ## Environment Variables
 
-| Variable          | Description                               | Example                                                 |
-| ----------------- | ----------------------------------------- | ------------------------------------------------------- |
-| `DATABASE_URL`    | The connection string for the PostgreSQL database. | `postgresql://user:password@localhost/bookit`           |
-| `SECRET_KEY`      | A secret key for signing JWTs.            | `your-very-secret-key`                                  |
-| `ALGORITHM`       | The algorithm used for JWT encoding.      | `HS256`                                                 |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | The lifetime of an access token in minutes. | `30`                                                    |
+-   `DATABASE_URL`: The connection string for the PostgreSQL database.
+-   `SECRET_KEY`: A secret key for signing JWTs.
+-   `ALGORITHM`: The algorithm used for JWT encoding.
+-   `ACCESS_TOKEN_EXPIRE_MINUTES`: The lifetime of an access token in minutes.
+-   `REFRESH_TOKEN_EXPIRE_DAYS`: The lifetime of a refresh token in days.
+-   `POSTGRES_USER`: The username for the PostgreSQL database.
+-   `POSTGRES_PASSWORD`: The password for the PostgreSQL database.
+-   `POSTGRES_DB`: The name of the PostgreSQL database.
 
-## Deployment
+## Deployment Notes
 
-**Production URL:** [To be added]
-**API Docs URL:** [To be added]/docs
+The application is containerized using Docker, which makes it easy to deploy to any cloud provider that supports Docker containers (e.g., AWS, Google Cloud, Azure, Render).
+
+The base URL for the API will depend on the hosting environment. The API documentation will be available at `/docs` (e.g., `https://your-domain.com/docs`).
+
+## Deploying on Render
+
+You can manually set up the service:
+
+1.  **Create a new Web Service on Render.**
+2.  **Connect your Git repository.**
+3.  **Set the following environment variables in the Render dashboard:**
+    *   `DATABASE_URL`: The connection string for the PostgreSQL database (you can use Render's own PostgreSQL service).
+    *   `SECRET_KEY`: A secret key for signing JWTs.
+    *   `ALGORITHM`: The algorithm used for JWT encoding.
+    *   `ACCESS_TOKEN_EXPIRE_MINUTES`: The lifetime of an access token in minutes.
+    *   `REFRESH_TOKEN_EXPIRE_DAYS`: The lifetime of a refresh token in days.
+4.  **Set the start command to:**
+    ```bash
+    alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    ```
+5.  **Deploy the service.**

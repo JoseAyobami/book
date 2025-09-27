@@ -48,10 +48,10 @@ class UserCrud:
         return new_admin
     
     @staticmethod
-    def login_user(db: Session, user: UserLogin):
-        db_user = authenticate_user(db, user.email, user.password)
+    def login_user(db: Session, email: str, password: str):
+        db_user = authenticate_user(db, email, password)
         if not db_user:
-            logger.warning(f"Invalid login credentials for user: {user.email}")
+            logger.warning(f"Invalid login credentials for user: {email}")
             return None
         access_token_expires = timedelta(minutes=30)
         access_token = create_access_token(

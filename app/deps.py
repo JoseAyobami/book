@@ -6,10 +6,11 @@ from app.database import get_db
 from app.models.base import UserRole    
 from app.setting import settings
 from app.models.user import User as UserModel
-from fastapi.security import HTTPBearer
+from fastapi.security import OAuth2PasswordBearer
 
 
-security = HTTPBearer()
+
+security = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
 
@@ -20,7 +21,7 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token.credentials, settings.secret_key, algorithms=[settings.algorithm])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         email: str = payload.get("sub")
         role: str = payload.get("role")
         if email is None:
@@ -34,14 +35,10 @@ def get_current_user(token: str = Depends(security), db: Session = Depends(get_d
 
 
 def get_current_admin(current_user: UserModel = Depends(get_current_user), token: str = Depends(security)):
-    payload = jwt.decode(token.credentials, settings.secret_key, algorithms=[settings.algorithm])
+    payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
     role: str = payload.get("role")
 
     if role != UserRole.admin.value:
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
-# def get_current_admin(current_user: UserModel = Depends(get_current_user)):
-#     if current_user.role != UserRole.admin.value:  
-#         raise HTTPException(status_code=403, detail="Admin access required")
-#     return current_user

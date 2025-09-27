@@ -1,4 +1,4 @@
-from datetime import timedelta
+from decimal import Decimal
 from sqlalchemy.orm import Session
 from app.logger import get_logger
 from app.models.base import UserRole
@@ -34,8 +34,8 @@ class ServiceCrud:
     def list_services(
         db: Session,
         q: str = "",
-        price_min: float = 0,
-        price_max: float = float("inf"),
+        price_min: Decimal = Decimal("0.00"),
+        price_max: Decimal = Decimal("9999999999.99"),
         active: bool | None = None,
         skip: int = 0,
         limit: int = 100
