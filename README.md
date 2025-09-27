@@ -78,5 +78,4 @@ You can manually set up the service:
     ```bash
     uvicorn app.main:app --host 0.0.0.0 --port $PORT
     ```
-5.   **Add env variables.**
-6.   **Deploy the service.**
+5.   **Deploy the service.**
