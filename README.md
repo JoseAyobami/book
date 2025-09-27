@@ -12,25 +12,6 @@ The application is built with **FastAPI**, a modern, fast (high-performance) web
 
 ## How to Run Locally
 
-### Using Docker
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repo-url>
-    cd bookit
-    ```
-
-2.  **Create a `.env` file:**
-    Copy the `.env.example` to a new `.env` file and fill in the required values.
-
-3.  **Build and run the containers:**
-    ```bash
-    docker-compose up --build
-    ```
-
-The API will be available at `http://localhost:8000`.
-
-### Without Docker
 
 1.  **Clone the repository:**
     ```bash
@@ -74,11 +55,11 @@ The API will be available at `http://localhost:8000`.
 -   `POSTGRES_PASSWORD`: The password for the PostgreSQL database.
 -   `POSTGRES_DB`: The name of the PostgreSQL database.
 
-## Deployment Notes
 
-The application is containerized using Docker, which makes it easy to deploy to any cloud provider that supports Docker containers (e.g., AWS, Google Cloud, Azure, Render).
 
-The base URL for the API will depend on the hosting environment. The API documentation will be available at `/docs` (e.g., `https://your-domain.com/docs`).
+# Deployment Notes
+
+
 
 ## Deploying on Render
 
