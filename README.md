@@ -34,8 +34,8 @@ The API will be available at `http://localhost:8000`.
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repo-url>
-    cd bookit
+    git clone <https://github.com/JoseAyobami/book>
+    cd book
     ```
 
 2.  **Create and activate a virtual environment:**
