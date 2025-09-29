@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from app.schemas.user import Token, TokenData, UserCreate, UserResponse, UserUpdate
 from app.models.user import User as UserModel
@@ -11,6 +11,7 @@ from app.deps import security
 from jose import JWTError, jwt
 from datetime import timedelta
 from app.setting import settings
+from app.limiter import limiter
 from app.logger import get_logger
 
 
@@ -50,7 +51,8 @@ def register_admin(user_data: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-def login_user(user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("5/minutes")
+def login_user(request: Request, user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     logger.info(f"User login attempt: {user_data.username}")
     access_token = UserCrud.login_user(db, user_data.username, user_data.password)
     if not access_token:

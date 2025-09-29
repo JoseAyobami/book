@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from datetime import date, datetime, timezone
 from app.models.base import BookingStatus
@@ -7,6 +7,7 @@ from app.crud.booking import BookingCrud
 from app.database import get_db
 from app.models.user import User as UserModel, UserRole
 from app.deps import get_current_user  
+from app.limiter import limiter
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
@@ -22,7 +23,9 @@ def create_booking(
     return new_booking
 
 @router.get("/", response_model=list[BookingResponse])
+@limiter.limit("10/minute")
 def list_bookings(
+    request: Request,
     status: str = None,
     from_dt: date = None,
     to_dt: date = None,
