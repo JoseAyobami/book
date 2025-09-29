@@ -76,6 +76,6 @@ You can manually set up the service:
     *   `REFRESH_TOKEN_EXPIRE_DAYS`: The lifetime of a refresh token in days.
 4.  **Set the start command to:**
     ```bash
-    alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    uvicorn app.main:app --host 0.0.0.0 --port $PORT
     ```
-5.  **Deploy the service.**
+5.   **Deploy the service.**
