@@ -45,6 +45,11 @@ The application is built with **FastAPI**, a modern, fast (high-performance) web
     uvicorn app.main:app --reload
     ```
 
+#  Note
+```
+For the admin, i made an endpoint to create an admin user 
+```
+
 ## Environment Variables
 
 -   `DATABASE_URL`: The connection string for the PostgreSQL database.
