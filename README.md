@@ -47,7 +47,7 @@ The application is built with **FastAPI**, a modern, fast (high-performance) web
 
 #  Note
 ```
-For the admin, i created an endpoint to create an admin user 
+For the admin, i made an endpoint to create an admin user 
 ```
 
 ## Environment Variables
