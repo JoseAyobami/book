@@ -21,8 +21,8 @@ class ReviewCrud:
             return None, "Booking not found or does not belong to the user"
 
         # Ensure booking is completed
-        if booking.status != BookingStatus.completed:
-            return None, "Cannot review a booking that is not completed"
+        #if booking.status != BookingStatus.completed:
+            #return None, "Cannot review a booking that is not completed"
 
         # Ensure one review per booking
         existing = db.query(ReviewModel).filter(
