@@ -51,8 +51,8 @@ def register_admin(user_data: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-@limiter.limit("5/minutes")
-def login_user(request: Request, user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+# @limiter.limit("5/minutes")
+def login_user(user_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     logger.info(f"User login attempt: {user_data.username}")
     access_token = UserCrud.login_user(db, user_data.username, user_data.password)
     if not access_token:
