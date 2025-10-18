@@ -20,9 +20,9 @@ class ReviewCrud:
         if not booking:
             return None, "Booking not found or does not belong to the user"
 
-        # Ensure booking is completed
-        if booking.status != BookingStatus.completed:
-            return None, "Cannot review a booking that is not completed"
+        # # Ensure booking is completed
+        # if booking.status != BookingStatus.completed:
+        #     return None, "Cannot review a booking that is not completed"
 
         # Ensure one review per booking
         existing = db.query(ReviewModel).filter(
@@ -43,7 +43,7 @@ class ReviewCrud:
         db.add(review)
         db.commit()
         db.refresh(review)
-        return review, None
+        return review
 
     @staticmethod
     def get_reviews_by_service(db: Session, service_id: str):
